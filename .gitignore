@@ -1,0 +1,10 @@
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+
+# *.tfplan means any file ending with extension .tfplan should be ignored. same goes with others 
+
+# .terraform/ is a dir. holds the aws provider plugin binary + internal terraform bookkeeping. Gen by `terraform init` | belongs to HashiCorp not us. 
+
+# tfstate contains real current record of everything terraform manages. 
