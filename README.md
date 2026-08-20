@@ -3,7 +3,7 @@ FinCommerce - Production-Style E-Commerce Platform on AWS
 
 # Problem
 
-# Architecture (placeholder)
+# Architecture
 
 # Tech Stack
 
