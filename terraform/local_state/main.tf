@@ -10,7 +10,7 @@ terraform {
 
   backend "s3" {
      bucket = "fincomm-tfstate-ashu2026"
-     key = "fincomm/ocal_state/terraform.tfstate"
+     key = "fincomm/local_state/terraform.tfstate"
      region = "ap-south-1"
   }
 
