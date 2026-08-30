@@ -13,6 +13,8 @@ a tutorial reproduction.
 
 *Full diagram coming - planned for Week 3 review (v1).*
 
+navigate to `/docs/adr` for Architecture Decision reports
+
 Current scope: two independent Terraform projects, each with its own S3-backed
 state file:
 - `terraform/local_state/` - EC2 instance provisioned via a reusable module
