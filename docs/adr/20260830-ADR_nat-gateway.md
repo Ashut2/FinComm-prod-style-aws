@@ -1,7 +1,7 @@
 # ADR-000: NAT Gateway — Do We Need One for FinCommerce Right Now?
 
 **Date:** 30 August 2026
-**Status:** <Proposed / Decided> -> Proposed
+**Status:** <Proposed / Decided> -> Decided
 
 ## Context
 
