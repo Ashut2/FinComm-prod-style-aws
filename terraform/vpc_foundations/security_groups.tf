@@ -28,7 +28,7 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_from_me" {
   security_group_id = aws_security_group.app_sg.id
-  cidr_ipv4         = "152.58.117.136/32"
+  cidr_ipv4         = "157.49.46.196/32"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
