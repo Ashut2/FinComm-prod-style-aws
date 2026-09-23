@@ -17,7 +17,7 @@ navigate to `/docs/adr` for Architecture Decision reports
 
 Current scope: two independent Terraform projects, each with its own S3-backed
 state file:
-- `terraform/local_state/` - EC2 instance provisioned via a reusable module
+- `terraform/ec2_app/` - EC2 instance provisioned via a reusable module
 - `terraform/vpc_foundations/` - VPC networking layer (public tier only)
 
 These aren't wired together yet - the EC2 instance still launches into the
@@ -51,7 +51,7 @@ default VPC, not the custom one. Connecting them is upcoming work.
 
 **EC2 instance (via module):**
 ```bash
-cd terraform/local_state
+cd terraform/ec2_app
 terraform init
 terraform plan
 terraform apply
