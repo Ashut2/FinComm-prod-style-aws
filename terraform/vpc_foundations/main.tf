@@ -22,7 +22,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "my-1st-terraform-cli-vpc"
+    Name = "fincomm-vpc"
   }
 }
 
