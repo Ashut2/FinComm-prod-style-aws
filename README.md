@@ -11,7 +11,7 @@ a tutorial reproduction.
 
 ## Architecture
 
-*Full diagram coming - planned for Week 3 review (v1).*
+See [`architecture/architecture.md`](architecture/architecture.md) for the v1 diagram and [`docs/concepts/mental-model.md`](docs/concepts/mental-model.md) for how the pieces link.
 
 navigate to `/docs/adr` for Architecture Decision reports
 
@@ -20,8 +20,9 @@ state file:
 - `terraform/ec2_app/` - EC2 instance provisioned via a reusable module
 - `terraform/vpc_foundations/` - VPC networking layer (public tier only)
 
-These aren't wired together yet - the EC2 instance still launches into the
-default VPC, not the custom one. Connecting them is upcoming work.
+They are wired together: `ec2_app` reads `vpc_foundations` outputs
+(`public_subnet_id`, `app_sg_id`) via `terraform_remote_state`, so the EC2
+instance launches into the custom VPC.
 
 ## Tech Stack
 
@@ -44,8 +45,8 @@ default VPC, not the custom one. Connecting them is upcoming work.
 - [ ] DynamoDB state locking — not yet implemented
 - [x] VPC + public subnet + Internet Gateway + route table (public tier only)
 - [ ] Private subnet + NAT Gateway — not yet built
-- [ ] EC2 instance connected to custom VPC — currently still in default VPC
-- [ ] Security Groups / NACLs implementation — theory covered, not yet applied
+- [x] EC2 instance connected to custom VPC (via remote state outputs)
+- [x] Security group applied (SSH from my IP, HTTP open); NACLs - theory only
 
 ## How to Run
 
