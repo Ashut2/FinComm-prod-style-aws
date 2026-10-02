@@ -1,6 +1,6 @@
 # FinComm — production-style AWS project
 
-A learning project. The owner must be able to explain every concept and resource to anyone, and will record a demo video. Optimise for **understanding first, speed second**.
+A learning project. The owner must be able to explain every concept and resource to anyone, and will record a demo video. Optimise for **understanding first, speed second**. Also owner should be able to explain the business impact , this project would have by the end of this project using numbers, facts & Impact in the narrative.
 
 ## Layout
 - `terraform/vpc_foundations/` — network layer (VPC, public subnet, IGW, route table, security groups). State: S3 `fincomm-tfstate-ashu2026`, region `ap-south-1`.
