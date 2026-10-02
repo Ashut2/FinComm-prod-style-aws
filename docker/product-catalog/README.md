@@ -25,9 +25,11 @@ machine and the app runs inside a container — that's the current setup.
 
 ## Build
 
+Run from the repo root. The Dockerfile lives here, the source lives in
+`application/product-catalog` (that folder is the build context):
+
 ```bash
-cd docker/product-catalog
-docker build -t fincomm/product-catalog:dev .
+docker build -f docker/product-catalog/Dockerfile -t fincomm/product-catalog:dev application/product-catalog
 ```
 
 ## Run
