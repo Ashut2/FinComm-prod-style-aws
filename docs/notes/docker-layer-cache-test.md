@@ -1,3 +1,5 @@
+################################### Part 1 ####################################
+
 # Docker layer cache test: product-catalog
 
 Date: 2026-10-02
@@ -48,16 +50,16 @@ Three builds, in order, each timed with `time`:
 
 ## Observations
 - Which step took the most time in the cold build, and why?
-compilation of the program `RUN CGO_ENABLED.....` took max time cause it was the first compilation, this step generated plain linux binary with no c Dependenies. and it saves it at the root of the filesystem (/). doing all of this obviously will eat more time than others.
+compilation of the program `RUN CGO_ENABLED.....` took max time cause it was the first compilation, this step generated plain linux binary with no c dependencies. and it saves it at the root of the filesystem (/). doing all of this obviously will eat more time than others. (Close second: `go mod download` took 29.8s, compile took 32.4s.)
 
 - In build 3, did the `go mod download` step stay cached? Why?
-In build 3 there has been no change in the copying of go liraries that are needed to run *.go files. so when we changed the main.go file it doesn't effect the copying of library & pluging of it into our ecosystem. 
+In build 3 there has been no change in the copying of go libraries that are needed to run *.go files. so when we changed the main.go file it doesn't effect the copying of library & pluging of it into our ecosystem. 
 
 But what have changed is the main.go file itself so compilation of that file is needed again.
 Hence `go mod download` step stay cached & `RUN CGO_ENABLED=...` is rebuilt
 
 - Was my hypothesis right? What did I get wrong?
-It was almost right upto the point. things I got wrong is just the step i forgot that would be rebuilt after `main.go` would be edited.  so writing them again here 
+It was almost right up to the point. things I got wrong is just the step i forgot that would be rebuilt after `main.go` would be edited.  so writing them again here 
 
 - the steps which be rebuilt again 
     - 8 : copy `*.go`,   it copies all go files 
@@ -78,3 +80,51 @@ I would give me conclusion in following points:
 
 ## Link to later work
 Block 3 (multi-stage build): compare the image size (1.35 GB single-stage) and the build behaviour against this baseline.
+
+################################# Part 2 #######################################
+
+Date: 2026-10-05
+
+## layer map from `docker history`
+```text
+docker history --format "table {{.CreatedBy}}\t{{.Size}}" fincomm/product-catalog:dev
+CREATED BY                                      SIZE
+CMD ["/plain-linux-binary"]                     0B
+EXPOSE [3550/tcp]                               0B
+RUN /bin/sh -c CGO_ENABLED=0 GOOS=linux go b…   350MB
+COPY *.go ./ # buildkit                         19.4kB
+COPY flags flags # buildkit                     2.7kB
+COPY genproto/oteldemo genproto/oteldemo # b…   140kB
+RUN /bin/sh -c go mod download # buildkit       158MB
+COPY go.sum go.sum # buildkit                   17.6kB
+COPY go.mod go.mod # buildkit                   4.52kB
+WORKDIR /app                                    0B
+WORKDIR /go                                     0B
+RUN /bin/sh -c mkdir -p "$GOPATH/src" "$GOPA…   0B
+COPY /target/ / # buildkit                      244MB
+ENV PATH=/go/bin:/usr/local/go/bin:/usr/loca…   0B
+ENV GOPATH=/go                                  0B
+ENV GOTOOLCHAIN=local                           0B
+ENV GOLANG_VERSION=1.27.1                       0B
+RUN /bin/sh -c set -eux;  apt-get update;  a…   259MB
+RUN /bin/sh -c set -eux;  apt-get update;  a…   177MB
+RUN /bin/sh -c set -eux;  apt-get update;  a…   48.4MB
+# debian.sh --arch 'amd64' out/ 'bookworm' '…   117MB
+```
+
+One takeaway: my image is 1.35GB but the program is 32 mb only.
+Go files needs only one executable file to run go programs & nothing else, the 350 MB compile layer is only a 32 MB program plus about 315 MB of Go's build cache (checked with `du` inside the image). 
+
+NOTE: Build times change a little from run to run, even when nothing in the Dockerfile changed. For example, the compile step took 24s in one build and 40s in another. So the exact seconds in this doc are rough. What I can rely on is the direction (a cached build is faster, and a bad instruction order is slower), not the exact number of seconds.
+
+## Bad order experiment
+| Dockerfile order | Rebuild after a one-line edit | `go mod download` |
+|---|---|---|
+| Good (libraries first) | 28.06s | CACHED |
+| Bad (source first) | 55.0s | re-ran |
+
+`Note:` this experiment proved that changing the order of source code copying & libraries copying results in different build time. In the bad build I moved the three source `COPY` lines above `RUN go mod download`. After a one-line edit, `COPY *.go` changed, so every step after it re-ran, including `go mod download`, which stayed CACHED in the good order. The rebuild took 55.0s instead of 28.06s (about 27s slower). 
+
+
+
+
