@@ -34,3 +34,6 @@ Layers being **shared** between containers of the same image (so two containers 
 
 ## Interview one-liner
 "An image is a read-only stack of layers. A container is an image plus a thin writable layer on top. Files a container writes go there, so they survive a stop and start but disappear when the container is deleted."
+
+## Official docs (checked 2026-10-09)
+- [About storage drivers](https://docs.docker.com/engine/storage/drivers/), sections "Images and layers" and "Container and layers": "When the container is deleted, the writable layer is also deleted."

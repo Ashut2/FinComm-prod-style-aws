@@ -28,3 +28,7 @@ Timings vary between runs (the compile step took 24 s to 66 s on identical work)
 - The base golang image layers are about 845 MB (about 62%); my own layers are about 508 MB (about 38%).
 - A multi-stage build ships only the program. That shrinks a Go service a lot, but a Python or Node service must still ship its interpreter, so it shrinks much less.
 - The "after" size of the multi-stage image is not measured yet. Record it in `docs/impact/impact-log.md` when it is.
+
+## Official docs (checked 2026-10-09)
+- [Build cache](https://docs.docker.com/build/cache/), section "How the build cache works": "If a layer changes, all other layers that come after it are also affected." This is the rule behind my numbers.
+- [Optimize build cache](https://docs.docker.com/build/cache/optimize/), section "Order your layers": the instruction-ordering advice.

@@ -54,3 +54,6 @@ So the default bridge is not isolated: containers reach each other by IP. Only n
 
 ## Why it matters next
 Compose (Block 3) creates a user-defined network automatically, which is why a compose file can use `product-catalog:3550` as an address. Kubernetes Services do the same job later.
+
+## Official docs (checked 2026-10-09)
+- [Bridge network driver](https://docs.docker.com/engine/network/drivers/bridge/), section "Differences between user-defined bridges and the default bridge". It says containers on the default bridge can only access each other by IP address, which matches my test.

@@ -20,3 +20,6 @@ Postgres runs **natively on the laptop**, not in a container, so its data is not
 
 ## Interview one-liner
 "Data written inside a container is lost when the container is deleted. A named volume lives outside the container, so a database keeps its data across container restarts and replacements."
+
+## Official docs (checked 2026-10-09)
+- [Volumes](https://docs.docker.com/engine/storage/volumes/), section "When to use volumes" (volumes are the preferred way to persist container data) and section "A volume's lifecycle" (data outlives the container).

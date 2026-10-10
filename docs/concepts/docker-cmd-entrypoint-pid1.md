@@ -31,10 +31,16 @@ The program a container starts becomes **PID 1**. `docker stop` sends it SIGTERM
 Reading the results:
 - **137 = 128 + 9** (SIGKILL): the program didn't exit on SIGTERM and was force-killed.
 - **143 = 128 + 15** (SIGTERM): the program shut down when asked, i.e. gracefully.
-- **Correction to my own expectation:** I predicted a plain `docker stop` would take about 10 s. On this Docker version it took about 3.5 s, while `-t 10` took about 10.5 s, so the default grace period here is shorter than 10 s. I did not find out why; the rule that matters (kill after the grace period, exit code 137) held.
+- **Correction to my own expectation:** I predicted a plain `docker stop` would take about 10 s. On this Docker version it took about 3.5 s, while `-t 10` took about 10.5 s, which does not match the 10 s default in the docs (see "Official docs" below). I did not find out why; the rule that matters (kill after the grace period, exit code 137) held.
 
 ## Not tested
 How `product-catalog` itself behaves on `docker stop` (graceful 143 or forced 137) is unknown. A quick check: run the container, `docker stop` it, read `.State.ExitCode`.
 
 ## Interview one-liner
 "CMD is a default that `docker run` arguments replace; ENTRYPOINT is the fixed program and arguments are appended. The container's main program is PID 1: `docker stop` sends SIGTERM and then SIGKILL after the grace period, and the exit code tells which happened, 143 for a graceful stop and 137 for a forced kill."
+
+## Official docs (checked 2026-10-09)
+- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/), section "Understand how CMD and ENTRYPOINT interact" (under ENTRYPOINT), which has the table of combinations.
+- [docker container stop](https://docs.docker.com/reference/cli/docker/container/stop/): the main process gets SIGTERM first, then SIGKILL after the timeout. The page says the default timeout is **10 seconds for Linux containers**.
+
+Open question: my `docker stop` took about 3.5 s here, not 10 s, even though the docs say 10 s (an explicit `-t 10` took about 10.5 s). I have not found why. Don't present the 3.5 s as a rule; the documented default is 10 s.
