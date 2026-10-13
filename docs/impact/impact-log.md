@@ -7,6 +7,7 @@ Projections go in the second table and always show their assumptions.
 
 | Date | What | Result | Evidence |
 |---|---|---|---|
+| 2026-10-13 | product-catalog image, single-stage -> multi-stage on `scratch` | 1.35 GB -> 33.1 MB (about 40x smaller); still serves 10 products | `docker images fincomm/product-catalog` (`:dev` vs `:multistage`); `scripts/product-catalog/verify_data.py` |
 | 2026-10-02 | product-catalog Docker build, cold (`--no-cache`) | 102.6 s | `docs/notes/docker-layer-cache-test.md` |
 | 2026-10-02 | Same build, nothing changed | 3.76 s (about 27x faster) | same |
 | 2026-10-02 | Same build after a one-line `main.go` edit | 28.06 s (about 3.7x faster, about 75 s saved) | same |
@@ -17,7 +18,6 @@ Projections go in the second table and always show their assumptions.
 | 2026-09 | Network layer defined as code | 9 Terraform resources, remote state in S3 | `terraform/vpc_foundations/` |
 
 ## Pending measurements (capture when they happen)
-- Image size after the multi-stage build (Block 3), the "after" for the 1.35 GB.
 - Time to bring up the full stack with one command (Compose, Block 3).
 - Time to rebuild the VPC from scratch with `terraform apply`.
 - Monthly AWS cost of the running stack.
