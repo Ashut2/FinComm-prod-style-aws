@@ -36,8 +36,15 @@ COPY *.go ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /plain-linux-binary 
 ### compiles the program | cgo_enabled=0 goos=linux are the settings for that command, telling it "build plain linux binary with zero dependency on C library". `-o /plain-linux-binary` names the resulting file plain-linux-binary and places it at the root of the image's filesystem (/). 
 
-EXPOSE 3550
-### it just for documentation, telling readers that this app listens on port 3550. It doesn't open the port & doesn't check whether the program really uses 3550. 
 
-### Run
-CMD ["/plain-linux-binary"]
+
+### second stage 
+FROM scratch 
+### copying the important binaries from builder stage & pasting it to the destination = empty image folder. 
+COPY --from=builder /plain-linux-binary /plain-linux-binary-empty-base
+### RUN
+CMD ["/plain-linux-binary-empty-base"]
+
+EXPOSE 3550
+### it just for documentation, telling readers that this app listens on port 3550. It doesn't open the port & doesn't check whether the program really uses 3550.
+
