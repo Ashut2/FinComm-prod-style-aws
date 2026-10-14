@@ -1,0 +1,10 @@
+
+services:
+  
+  db:
+    image: postgres
+
+  product_catalog:
+    image: fincomm/product-catalog:multistage
+
+
