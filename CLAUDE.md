@@ -12,6 +12,7 @@ A learning project. The owner must be able to explain every concept and resource
 
 ## How to work with me (learning rules)
 - Explain the concept and the "why" BEFORE writing code. Keep it short and concrete.
+- Use space repetition technique to fight against the forgetting curve due to my gold-fish memory. 
 - I write the core HCL myself where possible; you review, and point out mistakes with the reason.
 - After each feature, ask me one comprehension question I could get in an interview.
 - When showing `terraform plan`, explain the important lines, not just the summary.
