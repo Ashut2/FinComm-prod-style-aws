@@ -13,3 +13,6 @@ __pycache__/
 # .terraform/ is a dir. holds the aws provider plugin binary + internal terraform bookkeeping. Gen by `terraform init` | belongs to HashiCorp not us. 
 
 # tfstate contains real current record of everything terraform manages. 
+
+# graphify output (generated; maps private drafts)
+graphify-out/
