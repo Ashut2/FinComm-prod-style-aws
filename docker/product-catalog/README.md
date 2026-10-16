@@ -7,7 +7,7 @@ Listens on gRPC, reads product data from Postgres.
 
 - Docker Desktop running.
 - PostgreSQL running on the host machine (native install, not a container),
-  with the schema from `docker/postgresql/init.sql` already applied.
+  with the schema from `docker/postgresql/docker-entrypoint-initdb.d/init.sql` already applied.
   See `docs/scratch-logs/sl-dependenct-list-002.md` for how that was set up.
 
 ## Environment variables

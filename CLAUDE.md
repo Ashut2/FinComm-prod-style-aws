@@ -7,7 +7,7 @@ A learning project. The owner must be able to explain every concept and resource
 - `terraform/ec2_app/` — EC2 root module calling `modules/ec2-instances`; reads VPC outputs via `terraform_remote_state`. (Renamed from `local_state`; its S3 state key is still `fincomm/local_state/terraform.tfstate` on purpose.)
 - `docs/adr/` decisions · `docs/scratch-logs/` quick debug logs · `docs/incident-temp/` polished incidents + template · `docs/notes/` study notes
 - `terraform/iam/` — IAM root (deployer policy, EC2 app role); planned and `terraform plan` checked, not applied
-- `application/product-catalog/` Go service source (copied from the OpenTelemetry demo) · `docker/product-catalog/` Dockerfile, README, `.env.example` · `docker/postgresql/init.sql` · `scripts/product-catalog/` test tooling (`verify_data.py`, venv is gitignored)
+- `application/product-catalog/` Go service source (copied from the OpenTelemetry demo) · `docker/product-catalog/` Dockerfile, README, `.env.example` · `docker/postgresql/docker-entrypoint-initdb.d/init.sql` · `scripts/product-catalog/` test tooling (`verify_data.py`, venv is gitignored)
 - `architecture/` diagrams · `docs/impact/` measured results (`impact-log.md`) + narrative drafts · `kubernetes/ observability/` planned, empty
 
 ## How to work with me (learning rules)
