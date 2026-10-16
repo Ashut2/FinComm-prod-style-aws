@@ -1,10 +1,21 @@
-
 services:
-  
   db:
-    image: postgres
+    image: postgres:18
+    # don't need ports, the app talks to `db` over the compose network and doesn't need the host port at all. we can delete them or we could use a diff host port such as 5433:5432
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - db:/var/lib/postgresql # got this path from `https://hub.docker.com/_/postgres` (find them with `ctrl+F`) {`env variables`-> the subsection "PGDATA"}.
+      - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
 
   product_catalog:
     image: fincomm/product-catalog:multistage
+
+  
+
+volumes:
+  db: 
 
 
