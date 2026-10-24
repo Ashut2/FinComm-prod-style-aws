@@ -6,12 +6,23 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     volumes:
-      - db:/var/lib/postgresql # got this path from `https://hub.docker.com/_/postgres` (find them with `ctrl+F`) {`env variables`-> the subsection "PGDATA"}.
+      - db:/var/librom `https://hub.docker.com/_/postgres` (find them with `ctrl+F`) {`env variables`-> the subsection "PGDATA"}.
+
       - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
 
   product_catalog:
-    image: fincomm/product-catalog:multistage
+    #image: fincomm/product-catalog:multistage
+    
+    build:
+      context: ../application/product-catalog
+      dockerfile: ../../docker/product-catalog/Dockerfile
+
+    ports:
+      - "3550:3550"
+    env_file:
+      - .env
+
 
   
 
