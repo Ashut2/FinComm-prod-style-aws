@@ -7,6 +7,7 @@ Projections go in the second table and always show their assumptions.
 
 | Date | What | Result | Evidence |
 |---|---|---|---|
+| 2026-10-25 | Whole stack (Postgres + product-catalog) from nothing with one command: `docker compose up -d --wait` after `down -v` (network, volume and containers recreated, `init.sql` re-run) | 7.05 s (`real`), one run, warm cache; both services healthy; 10 products returned | `time` output; `docker ps`; `scripts/product-catalog/verify_data.py`; scope: images already built and cached, so build and pull time are not included |
 | 2026-10-13 | product-catalog image, single-stage -> multi-stage on `scratch` | 1.35 GB -> 33.1 MB (about 40x smaller); still serves 10 products | `docker images fincomm/product-catalog` (`:dev` vs `:multistage`); `scripts/product-catalog/verify_data.py` |
 | 2026-10-02 | product-catalog Docker build, cold (`--no-cache`) | 102.6 s | `docs/notes/docker-layer-cache-test.md` |
 | 2026-10-02 | Same build, nothing changed | 3.76 s (about 27x faster) | same |
@@ -18,7 +19,6 @@ Projections go in the second table and always show their assumptions.
 | 2026-09 | Network layer defined as code | 9 Terraform resources, remote state in S3 | `terraform/vpc_foundations/` |
 
 ## Pending measurements (capture when they happen)
-- Time to bring up the full stack with one command (Compose, Block 3).
 - Time to rebuild the VPC from scratch with `terraform apply`.
 - Monthly AWS cost of the running stack.
 
