@@ -9,6 +9,30 @@ Infrastructure as Code, containerization, Kubernetes orchestration, CI/CD,
 observability, and incident response - as a hands-on portfolio project, not
 a tutorial reproduction.
 
+## Results so far (measured, see [`docs/impact/impact-log.md`](docs/impact/impact-log.md))
+
+| What | Result |
+|---|---|
+| Container image size, single-stage vs multi-stage on `scratch` | 1.35 GB -> 33.1 MB (about 40x smaller) |
+| Docker rebuild after a one-line code edit, bad vs good instruction order | 55.0 s vs 28.06 s; fully cached rebuild 3.76 s |
+| Full stack (Postgres + service) from nothing with one command | 7.05 s (one run, warm cache; excludes image build) |
+
+> One command brings up my Go service and Postgres in about 7 seconds, with data on a volume and a healthcheck so the app waits for the database.
+
+## What is built
+
+- **AWS, as code (Terraform):** VPC, public subnet, Internet Gateway, route table, security group and an EC2 instance, with remote state in S3. An IAM layer is planned and plan-checked, not applied.
+- **Containers (Docker + Compose, runs locally):** a Go gRPC service (`product-catalog`, taken from the OpenTelemetry demo and containerised by me) and PostgreSQL 18 in a container with a persistent volume, started with one command. The containers are not deployed to AWS yet.
+
+## Quick start (local containers)
+
+```bash
+cp docker/.env.example docker/.env      # then fill in the values
+docker compose -f docker/docker-compose.yaml up -d --wait
+cd scripts/product-catalog && pip install grpcio protobuf && python verify_data.py
+```
+Expected: `number of products: 10`. Stop with `docker compose -f docker/docker-compose.yaml down` (add `-v` to also delete the database volume).
+
 ## Architecture
 
 See [`architecture/architecture.md`](architecture/architecture.md) for the v1 diagram and [`docs/concepts/mental-model.md`](docs/concepts/mental-model.md) for how the pieces link.
@@ -28,6 +52,8 @@ instance launches into the custom VPC.
 
 - **IaC:** Terraform (`hashicorp/aws` provider v6.58.0)
 - **Cloud:** AWS (EC2, VPC, S3)
+- **Containers:** Docker (multi-stage builds), Docker Compose (healthchecks, named volume)
+- **App layer:** Go gRPC service (from the OpenTelemetry demo), PostgreSQL 18
 - **State management:** S3 remote backend with versioning enabled, separate
   state keys per project
 - **Environment:** Git Bash (MINGW64) on Windows
@@ -47,6 +73,15 @@ instance launches into the custom VPC.
 - [ ] Private subnet + NAT Gateway — not yet built
 - [x] EC2 instance connected to custom VPC (via remote state outputs)
 - [x] Security group applied (SSH from my IP, HTTP open); NACLs - theory only
+
+**Containers (Docker block): in progress**
+
+- [x] Single-stage Dockerfile, layer-cache and volume experiments, container networking
+- [x] Multi-stage build on `scratch` (1.35 GB -> 33.1 MB), verified with a gRPC client
+- [x] Docker Compose: app + Postgres, named volume, `init.sql`, healthcheck with `depends_on: service_healthy`
+- [ ] Push image to a registry (ECR)
+- [ ] CI pipeline that builds the image
+- [ ] Kubernetes, observability: planned
 
 ## How to Run
 
@@ -89,3 +124,4 @@ immediately after each test.
 - AWS reserves 5 IP addresses *within each individual subnet* (network,
   router, DNS, future-use, broadcast) — this reservation resets per subnet,
   it doesn't consume address space cumulatively across a VPC's subnet range.
+- 
