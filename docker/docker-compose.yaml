@@ -1,19 +1,30 @@
 services:
   db:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U astronomy_user -d astronomy_db"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
     image: postgres:18
     # don't need ports, the app talks to `db` over the compose network and doesn't need the host port at all. we can delete them or we could use a diff host port such as 5433:5432
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     volumes:
-      - db:/var/librom `https://hub.docker.com/_/postgres` (find them with `ctrl+F`) {`env variables`-> the subsection "PGDATA"}.
+      - db:/var/lib/postgresql 
+
+      ### `https://hub.docker.com/_/postgres` (find them with `ctrl+F`) {`env variables`-> the subsection "PGDATA"}.
 
       - ./postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
 
   product_catalog:
     #image: fincomm/product-catalog:multistage
-    
+    depends_on:
+      db:
+        condition: service_healthy
     build:
       context: ../application/product-catalog
       dockerfile: ../../docker/product-catalog/Dockerfile
