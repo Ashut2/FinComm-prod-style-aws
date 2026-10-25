@@ -1,6 +1,6 @@
 # FinComm Architecture (v1)
 
-Solid = deployed via Terraform. Dashed = planned (see `docs/adr/20260830-ADR_nat-gateway.md`).
+AWS diagram: solid = deployed via Terraform, dashed = planned (see `docs/adr/20260830-ADR_nat-gateway.md`). The container stack further down runs locally.
 
 ```mermaid
 flowchart TB
@@ -36,6 +36,36 @@ flowchart TB
     style nat stroke-dasharray: 5 5
     style priv stroke-dasharray: 5 5
 ```
+
+## Container stack (local, Docker Compose)
+
+This runs on my laptop, not on AWS yet. One command (`docker compose up -d --wait`) creates the network, the volume and both containers.
+
+```mermaid
+flowchart LR
+    client["verify_data.py<br/>(gRPC client)"] -- "localhost:3550" --> app
+
+    subgraph compose["Compose project 'docker' (network docker_default)"]
+        app["product_catalog<br/>Go gRPC service<br/>multi-stage image on scratch, 33.1 MB"]
+        db[("db: postgres:18<br/>healthcheck: pg_isready")]
+        vol[("named volume docker_db<br/>/var/lib/postgresql")]
+        init["init.sql in docker-entrypoint-initdb.d<br/>(runs only when the volume is empty)"]
+    end
+
+    app -- "db:5432, starts only after db is healthy" --> db
+    db --- vol
+    init -.-> db
+```
+
+| Piece | Why it is built this way |
+|---|---|
+| Multi-stage build on `scratch` | Compile in a large Go image, ship only the static binary: 1.35 GB -> 33.1 MB |
+| Service name `db` as the host | Compose gives each service a DNS name on its network; no IP addresses in config |
+| Named volume | Database data survives container removal; `down -v` deletes it on purpose |
+| `healthcheck` + `depends_on: service_healthy` | "Started" is not "ready": the app waits until Postgres accepts connections (see `docs/scratch-logs/sl-004.md`) |
+| No host port on `db` | The app reaches it over the Compose network; host port 5432 is already used by a native Postgres |
+
+Open items: push the image to a registry (ECR), build it in CI, then Kubernetes.
 
 ## Terraform mapping
 | Diagram box | Resource | File |
