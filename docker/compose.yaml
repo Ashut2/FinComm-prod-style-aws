@@ -34,8 +34,21 @@ services:
     env_file:
       - .env
 
+  recommendation:
+    depends_on:
+      product_catalog:
+        condition: service_started
 
-  
+    build:
+      context: ../application/recommendation
+      dockerfile: ../../docker/recommendation/Dockerfile
+
+    ports:
+      - "9550:9001"
+    environment:
+      OTEL_SERVICE_NAME: "recommendation"
+      RECOMMENDATION_PORT: 9001
+      PRODUCT_CATALOG_ADDR: "product_catalog:3550"
 
 volumes:
   db: 

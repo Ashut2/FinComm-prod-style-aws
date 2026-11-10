@@ -22,20 +22,30 @@ a tutorial reproduction.
 ## What is built
 
 - **AWS, as code (Terraform):** VPC, public subnet, Internet Gateway, route table, security group and an EC2 instance, with remote state in S3. An IAM layer is planned and plan-checked, not applied.
-- **Containers (Docker + Compose, runs locally):** a Go gRPC service (`product-catalog`, taken from the OpenTelemetry demo and containerised by me) and PostgreSQL 18 in a container with a persistent volume, started with one command. The containers are not deployed to AWS yet.
+- **Containers (Docker + Compose, runs locally):** PostgreSQL 18, the Go gRPC `product_catalog` service, and the Python gRPC `recommendation` service. The recommendation-to-catalog request was verified with a host-side smoke check. The frontend is not connected yet, and these containers are not deployed to AWS.
 
 ## Quick start (local containers)
 
 ```bash
 cp docker/.env.example docker/.env      # then fill in the values
-docker compose -f docker/docker-compose.yaml up -d --wait
-cd scripts/product-catalog && pip install grpcio protobuf && python verify_data.py
+cd docker && docker compose up -d --build --wait
 ```
-Expected: `number of products: 10`. Stop with `docker compose -f docker/docker-compose.yaml down` (add `-v` to also delete the database volume).
+
+Run the recommendation-to-catalog smoke check from the repository root with the recommendation Python virtual environment and generated modules available:
+
+```bash
+python -m venv application/recommendation/venv
+application/recommendation/venv/Scripts/python.exe -m pip install grpcio protobuf
+PYTHONPATH=application/recommendation application/recommendation/venv/Scripts/python.exe scripts/recommendation/verify_recommendation.py
+```
+
+Stop the stack from `docker/` with `docker compose down` (add `-v` to also delete the database volume).
 
 ## Architecture
 
 See [`architecture/architecture.md`](architecture/architecture.md) for the v1 diagram and [`docs/concepts/mental-model.md`](docs/concepts/mental-model.md) for how the pieces link.
+
+See [`docs/project-plan.md`](docs/project-plan.md) for the current Compose milestone, verified progress, and remaining steps.
 
 navigate to `/docs/adr` for Architecture Decision reports
 
@@ -78,7 +88,9 @@ instance launches into the custom VPC.
 
 - [x] Single-stage Dockerfile, layer-cache and volume experiments, container networking
 - [x] Multi-stage build on `scratch` (1.35 GB -> 33.1 MB), verified with a gRPC client
-- [x] Docker Compose: app + Postgres, named volume, `init.sql`, healthcheck with `depends_on: service_healthy`
+- [x] Docker Compose: Postgres + product catalog + recommendation; database healthcheck gates product-catalog startup
+- [ ] Add and verify the frontend in the Compose stack
+- [ ] Verify the complete stack from a clean start with one Compose command
 - [ ] Push image to a registry (ECR)
 - [ ] CI pipeline that builds the image
 - [ ] Kubernetes, observability: planned
